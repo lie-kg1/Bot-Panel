@@ -38,22 +38,22 @@ while true; do
     case $choice in
         1)
             printf "${GREEN}Running install...${NC}\n"
-            bash <(curl -sL https://raw.githubusercontent.com/lie-kg1/Bot-Panel/raw/refs/heads/main/Bot-Panel/Installer.sh)
+            bash <(curl -sL https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main/Bot-Panel/Installer.sh)
             read -p "Press Enter to continue..."
             ;;
         2)
             printf "${GREEN}Creating bot configuration...${NC}\n"
-            bash <(curl -sL "https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main/Bot-Panel/Setup%20.env%20Configuration.sh")
+            bash <(curl -sL "https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main/Bot-Panel/.env%20Configuration.sh")
             read -p "Press Enter to continue..."
             ;;
         3)
             printf "${GREEN}Opening 24/7 manager...${NC}\n"
-            bash <(curl -sL "https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main/Bot-Panel/Opening%20247%20manager.sh")
+            bash <(curl -sL "https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main/Bot-Panel/247%20Manager.sh")
             read -p "Press Enter to continue..."
             ;;
         4)
             printf "${RED}Running uninstall...${NC}\n"
-            bash <(curl -sL https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main/Bot-Panel/uninstall.sh)
+            bash <(curl -sL https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main/Bot-Panel/Uninstall.sh)
             read -p "Press Enter to continue..."
             ;;
         5)
