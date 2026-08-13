@@ -13,12 +13,12 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 
 launch_botpanel() {
-    if [ -x "${SCRIPT_DIR}/botpanel.sh" ]; then
-        "${SCRIPT_DIR}/botpanel.sh" start
-    elif [ -f "${SCRIPT_DIR}/botpanel.sh" ]; then
-        bash "${SCRIPT_DIR}/botpanel.sh" start
+    if [ -x "${SCRIPT_DIR}/Bot Panel.sh" ]; then
+        "${SCRIPT_DIR}/Bot Panel.sh" start
+    elif [ -f "${SCRIPT_DIR}/Bot Panel.sh" ]; then
+        bash "${SCRIPT_DIR}/Bot Panel.sh" start
     else
-        printf "${RED}botpanel.sh not found in ${SCRIPT_DIR}.${NC}\n"
+        printf "${RED}Bot Panel.sh not found in ${SCRIPT_DIR}.${NC}\n"
     fi
 }
 
