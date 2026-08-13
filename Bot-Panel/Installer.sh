@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# install.sh — installer for Bot Panel
-# Installs dependencies, sets up .env, and prepares the panel to run.
+# deploy-all.sh — Combined Installer for Bot Panel & VPS Deployment
 #
+
 set -euo pipefail
 
 GREEN='\033[0;32m'
@@ -14,6 +14,7 @@ info()  { echo -e "${GREEN}[INFO]${NC} $1"; }
 warn()  { echo -e "${YELLOW}[WARN]${NC} $1"; }
 error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
+# Resolve project root safely
 if [[ "${BASH_SOURCE[0]}" == /dev/fd/* || "${BASH_SOURCE[0]}" == /proc/*/fd/* ]]; then
     PROJECT_ROOT="$PWD"
 else
@@ -22,10 +23,11 @@ fi
 cd "$PROJECT_ROOT"
 
 echo "=========================================="
-echo "          Bot Panel — Installer"
+echo "      Bot Panel — Full Installer"
 echo "=========================================="
 echo
 
+# 1. Verify Node.js project environment
 if [ ! -f "package.json" ]; then
     error "package.json not found in $(pwd)."
     error "Run this from inside the Bot-Panel project directory."
@@ -36,7 +38,6 @@ if ! command -v node &> /dev/null; then
     error "Node.js is not installed. Install Node.js (v18+ recommended) and re-run."
     exit 1
 fi
-
 info "Found Node.js $(node -v)"
 
 if ! command -v npm &> /dev/null; then
@@ -44,9 +45,11 @@ if ! command -v npm &> /dev/null; then
     exit 1
 fi
 
-info "Installing dependencies..."
+# 2. Install Node Dependencies
+info "Installing Node.js dependencies..."
 npm install
 
+# 3. Setup Node.js .env configuration
 if [ -f ".env" ]; then
     warn ".env already exists — leaving it untouched."
 else
@@ -67,5 +70,31 @@ else
     fi
 fi
 
+# 4. Optional VPS Python environment setup
+if [ -d "Bot-Panel" ] || [ -f "bot.py" ] || [ -f "requirements.txt" ]; then
+    info "Setting up VPS environment files..."
+    mkdir -p Bot-Panel
+    
+    if [ -f "requirements.txt" ]; then
+        cp requirements.txt Bot-Panel/
+    fi
+    if [ -f "bot.py" ]; then
+        cp bot.py Bot-Panel/
+    fi
+
+    if command -v apt &> /dev/null && command -v sudo &> /dev/null; then
+        info "Installing system Python packages via apt..."
+        sudo apt update -y && sudo apt install -y python3-pip
+        
+        cd vps-deploy
+        if [ -f "requirements.txt" ]; then
+            python3 -m pip install -r requirements.txt --quiet
+        fi
+        python3 -m pip install --upgrade --quiet discord.py docker python-dotenv aiofiles PyNaCl psutil
+        cd "$PROJECT_ROOT"
+    fi
+fi
+
 echo
-info "Installation complete."
+info "Full installation complete!"
+echo "To start your panel, run: npm start"
