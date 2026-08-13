@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings — Bot Panel</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <span class="dot" style="width:10px;height:10px;border-radius:50%;background:var(--signal-green);box-shadow:0 0 10px var(--signal-green);"></span>
+      <span class="mark-text">BOT PANEL</span>
+      <a href="index.html" class="back-link">&larr; Dashboard</a>
+    </div>
+    <button class="logout-btn" id="logout-btn">Sign out</button>
+  </div>
+
+  <div class="container">
+    <div class="settings-nav" role="tablist" aria-label="Settings sections">
+      <button class="settings-tab active" data-tab="appearance" role="tab" aria-selected="true">Appearance</button>
+      <button class="settings-tab" data-tab="users" role="tab" aria-selected="false">Users</button>
+    </div>
+
+    <!-- ---------- Appearance ---------- -->
+    <section class="panel settings-panel" data-panel="appearance">
+      <div class="panel-header">
+        <h2>Appearance</h2>
+      </div>
+      <div class="panel-body">
+        <div class="theme-row">
+          <div>
+            <div class="theme-row-label">Display mode</div>
+            <div class="theme-row-sub">Switches the panel's look on this device only.</div>
+          </div>
+          <button class="theme-switch" id="theme-switch" data-theme-state="dark" aria-pressed="false">
+            <span class="theme-switch-track">
+              <span class="theme-switch-thumb"></span>
+            </span>
+            <span class="theme-switch-label" id="theme-switch-label">DARK</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- Users ---------- -->
+    <section class="panel settings-panel" data-panel="users" hidden>
+      <div class="panel-header">
+        <h2>Users</h2>
+      </div>
+      <div class="panel-body">
+        <table class="user-table" id="user-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Last active</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="user-table-body"></tbody>
+        </table>
+
+        <div class="user-empty" id="user-empty" hidden>No users yet. Add the first one below.</div>
+
+        <form id="add-user-form" class="add-user-form">
+          <div class="add-user-fields">
+            <div>
+              <label for="new-username">Username</label>
+              <input type="text" id="new-username" name="username" autocomplete="off" required />
+            </div>
+            <div>
+              <label for="new-password">Password</label>
+              <input type="password" id="new-password" name="password" autocomplete="new-password" required />
+            </div>
+            <div>
+              <label for="new-role">Role</label>
+              <select id="new-role" name="role">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-start">Add user</button>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="settings.js"></script>
+</body>
+</html>
