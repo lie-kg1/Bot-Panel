@@ -38,7 +38,7 @@ while true; do
     case $choice in
         1)
             printf "${GREEN}Running install...${NC}\n"
-            bash <(curl -sL https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main/Bot-Panel/install.sh)
+            bash <(curl -sL https://raw.githubusercontent.com/lie-kg1/Bot-Panel/raw/refs/heads/main/Bot-Panel/Installer.sh)
             read -p "Press Enter to continue..."
             ;;
         2)
