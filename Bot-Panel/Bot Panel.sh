@@ -10,44 +10,57 @@ RED='\033[1;31m'
 BLUE='\033[1;34m'
 NC='\033[0m' # No Color
 
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+
+launch_botpanel() {
+    if [ -x "${SCRIPT_DIR}/botpanel.sh" ]; then
+        "${SCRIPT_DIR}/botpanel.sh" start
+    elif [ -f "${SCRIPT_DIR}/botpanel.sh" ]; then
+        bash "${SCRIPT_DIR}/botpanel.sh" start
+    else
+        printf "${RED}botpanel.sh not found in ${SCRIPT_DIR}.${NC}\n"
+    fi
+}
+
 while true; do
     clear
     printf "${BLUE}──────────────────────────────────────${NC}\n"
     printf "${CYAN}              Bot Panel               ${NC}\n"
     printf "${BLUE}──────────────────────────────────────${NC}\n"
     printf "${YELLOW}1)${NC} 📦 Running install\n"
-    printf "${YELLOW}2)${NC} ⚙️ Setup .env Configuration File\n"
-    printf "${YELLOW}4)${NC} 🚀 Opening 24/7 manager\n"
-    printf "${YELLOW}5)${NC} 🗑️ Running uninstall\n"
-    printf "${YELLOW}6)${NC} 🌐 Launch botpanel\n"
-    printf "${YELLOW}7)${NC} 👋 Exit\n"
+    printf "${YELLOW}2)${NC} ⚙️  Setup .env Configuration File\n"
+    printf "${YELLOW}3)${NC} 🚀 Opening 24/7 manager\n"
+    printf "${YELLOW}4)${NC} 🗑️  Running uninstall\n"
+    printf "${YELLOW}5)${NC} 🌐 Launch botpanel\n"
+    printf "${YELLOW}6)${NC} 👋 Exit\n"
     printf "${BLUE}──────────────────────────────────────${NC}\n"
-    read -p "Choose an option [1-7]: " choice
-
+    read -p "Choose an option [1-6]: " choice
     case $choice in
         1)
             printf "${GREEN}Running install...${NC}\n"
-            bash <(curl -sL https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main/Bot-Panel/Bot%20Panel%20Installer.sh)
+            bash <(curl -sL https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main/Bot-Panel/install.sh)
             read -p "Press Enter to continue..."
             ;;
         2)
             printf "${GREEN}Creating bot configuration...${NC}\n"
-            bash <(curl -sL https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main/Bot-Panel/Bot%20Panel%20.env%20Configuration.sh)
-            ;;
-        4)
-            printf "${GREEN}Opening 24/7 manager...${NC}\n"
-            bash <(curl -sL https://raw.githubusercontent.com/lie-kg1/1.0-Bot-lxc/refs/heads/main/botpanel/Opening%20247%20manager.sh)
-            ;;
-        5)
-            printf "${RED}Running uninstall...${NC}\n"
-            bash <(curl -sL https://raw.githubusercontent.com/lie-kg1/1.0-Bot-lxc/raw/refs/heads/main/botpanel/uninstall.sh)
+            bash <(curl -sL "https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main/Bot-Panel/Setup%20.env%20Configuration.sh")
             read -p "Press Enter to continue..."
             ;;
-        6)
+        3)
+            printf "${GREEN}Opening 24/7 manager...${NC}\n"
+            bash <(curl -sL "https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main/Bot-Panel/Opening%20247%20manager.sh")
+            read -p "Press Enter to continue..."
+            ;;
+        4)
+            printf "${RED}Running uninstall...${NC}\n"
+            bash <(curl -sL https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main/Bot-Panel/uninstall.sh)
+            read -p "Press Enter to continue..."
+            ;;
+        5)
             launch_botpanel
             read -p "Press Enter to continue..."
             ;;
-        7)
+        6)
             printf "${CYAN}Exiting...${NC}\n"
             exit 0
             ;;
