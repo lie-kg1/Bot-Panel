@@ -1,4 +1,4 @@
-# botpanel
+# Bot Panel
 
 A small web control panel for managing a bot process: start/stop/restart, live log streaming, and a config.json editor — password protected.
 
