@@ -5,6 +5,11 @@
 # Lets you view and update PANEL_PASSWORD, SESSION_SECRET, PORT,
 # BOT_COMMAND, BOT_ARGS, and BOT_CWD without hand-editing the file.
 #
+# Works both as a local file and when run via
+# bash <(curl -sL .../Setup .env Configuration.sh) — in the latter
+# case there's no real script path, so we fall back to the current
+# working directory.
+#
 set -euo pipefail
 
 GREEN='\033[0;32m'
@@ -17,9 +22,13 @@ info()  { echo -e "${GREEN}[INFO]${NC} $1"; }
 warn()  { echo -e "${YELLOW}[WARN]${NC} $1"; }
 error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-# ---- resolve project root (this script lives in Bot-Panel/) ----
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
-cd "$SCRIPT_DIR"
+# ---- resolve project root ----
+if [[ "${BASH_SOURCE[0]}" == /dev/fd/* || "${BASH_SOURCE[0]}" == /proc/*/fd/* ]]; then
+    PROJECT_ROOT="$PWD"
+else
+    PROJECT_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+fi
+cd "$PROJECT_ROOT"
 
 ENV_FILE=".env"
 ENV_EXAMPLE=".env.example"
@@ -29,15 +38,17 @@ echo "     Bot Panel — .env Configuration"
 echo "──────────────────────────────────────────"
 echo
 
+# ---- confirm we're in the project directory ----
+if [ ! -f "$ENV_EXAMPLE" ] && [ ! -f "$ENV_FILE" ]; then
+    error "Neither .env nor .env.example found in $(pwd)."
+    error "Run this from inside the Bot-Panel project directory."
+    exit 1
+fi
+
 # ---- ensure .env exists ----
 if [ ! -f "$ENV_FILE" ]; then
-    if [ -f "$ENV_EXAMPLE" ]; then
-        cp "$ENV_EXAMPLE" "$ENV_FILE"
-        info "No .env found — created one from $ENV_EXAMPLE."
-    else
-        error "Neither .env nor .env.example found. Cannot continue."
-        exit 1
-    fi
+    cp "$ENV_EXAMPLE" "$ENV_FILE"
+    info "No .env found — created one from $ENV_EXAMPLE."
 fi
 
 # ---- helper: get current value of a key ----
