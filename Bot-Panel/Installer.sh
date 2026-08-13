@@ -5,7 +5,7 @@
 
 set -euo pipefail
 
-REPO_RAW="https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main/installer.sh"
+REPO_RAW="https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main"
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
