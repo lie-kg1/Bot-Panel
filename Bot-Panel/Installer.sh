@@ -5,8 +5,6 @@
 
 set -euo pipefail
 
-REPO_RAW="https://raw.githubusercontent.com/lie-kg1/Bot-Panel/refs/heads/main"
-
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
@@ -16,23 +14,31 @@ info()  { echo -e "${GREEN}[INFO]${NC} $1"; }
 warn()  { echo -e "${YELLOW}[WARN]${NC} $1"; }
 error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-# Resolve project root safely
+# Resolve project root safely and ensure we are in the Bot-Panel directory
 if [[ "${BASH_SOURCE[0]}" == /dev/fd/* || "${BASH_SOURCE[0]}" == /proc/*/fd/* ]]; then
     PROJECT_ROOT="$PWD"
 else
     PROJECT_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 fi
+
 cd "$PROJECT_ROOT"
 
+# Auto-navigate into Bot-Panel folder if we are in the parent directory
+if [ ! -f "package.json" ] && [ -d "Bot-Panel" ] && [ -f "Bot-Panel/package.json" ]; then
+    info "Found Bot-Panel directory. Moving inside..."
+    cd "Bot-Panel"
+    PROJECT_ROOT="$PWD"
+fi
+
 echo "=========================================="
-echo "      Bot Panel — Full Installer"
+echo "          Bot Panel — Installer"
 echo "=========================================="
 echo
 
 # 1. Verify Node.js project environment
 if [ ! -f "package.json" ]; then
     error "package.json not found in $(pwd)."
-    error "Run this from inside the Bot-Panel project directory."
+    error "Please clone the repository or place this script inside the Bot-Panel project directory."
     exit 1
 fi
 
@@ -59,41 +65,38 @@ else
         cp .env.example .env
         info "Created .env from .env.example."
     else
-        error ".env.example not found."
-        exit 1
+        warn ".env.example not found. Creating a blank .env file."
+        touch .env
     fi
 
     if command -v openssl &> /dev/null; then
         SESSION_SECRET="$(openssl rand -hex 32)"
         if grep -q '^SESSION_SECRET=' .env; then
             sed -i.bak "s|^SESSION_SECRET=.*|SESSION_SECRET=${SESSION_SECRET}|" .env && rm -f .env.bak
-            info "Generated a random SESSION_SECRET."
+        else
+            echo "SESSION_SECRET=${SESSION_SECRET}" >> .env
         fi
+        info "Generated and added a secure SESSION_SECRET."
     fi
 fi
 
 # 4. Optional VPS Python environment setup
-if [ -d "Bot-Panel" ] || [ -f "bot.py" ] || [ -f "requirements.txt" ]; then
+if [ -f "bot.py" ] || [ -f "requirements.txt" ] || [ -d "vps-deploy" ]; then
     info "Setting up VPS environment files..."
-    mkdir -p Bot-Panel
     
-    if [ -f "requirements.txt" ]; then
-        cp requirements.txt Bot-Panel/
-    fi
-    if [ -f "bot.py" ]; then
-        cp bot.py Bot-Panel/
-    fi
-
     if command -v apt &> /dev/null && command -v sudo &> /dev/null; then
         info "Installing system Python packages via apt..."
-        sudo apt update -y && sudo apt install -y python3-pip
+        sudo apt update -y && sudo apt install -y python3-pip python3-venv
         
-        cd vps-deploy
-        if [ -f "requirements.txt" ]; then
-            python3 -m pip install -r requirements.txt --quiet
+        if [ -d "vps-deploy" ]; then
+            cd vps-deploy
+            if [ -f "requirements.txt" ]; then
+                python3 -m pip install -r requirements.txt --quiet
+            fi
+            cd "$PROJECT_ROOT"
         fi
+        
         python3 -m pip install --upgrade --quiet discord.py docker python-dotenv aiofiles PyNaCl psutil
-        cd "$PROJECT_ROOT"
     fi
 fi
 
