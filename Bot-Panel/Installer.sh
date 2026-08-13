@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/usr/init/env bash
 #
-# deploy-all.sh — Combined Installer for Bot Panel & VPS Deployment
+# install.sh — Automated Installer for Bot Panel
 #
 
 set -euo pipefail
@@ -14,7 +14,7 @@ info()  { echo -e "${GREEN}[INFO]${NC} $1"; }
 warn()  { echo -e "${YELLOW}[WARN]${NC} $1"; }
 error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-# Resolve project root safely and ensure we are in the Bot-Panel directory
+# Resolve project root safely
 if [[ "${BASH_SOURCE[0]}" == /dev/fd/* || "${BASH_SOURCE[0]}" == /proc/*/fd/* ]]; then
     PROJECT_ROOT="$PWD"
 else
@@ -23,7 +23,7 @@ fi
 
 cd "$PROJECT_ROOT"
 
-# Auto-navigate into Bot-Panel folder if we are in the parent directory
+# Auto-navigate into Bot-Panel folder if executed from parent workspace
 if [ ! -f "package.json" ] && [ -d "Bot-Panel" ] && [ -f "Bot-Panel/package.json" ]; then
     info "Found Bot-Panel directory. Moving inside..."
     cd "Bot-Panel"
@@ -38,7 +38,7 @@ echo
 # 1. Verify Node.js project environment
 if [ ! -f "package.json" ]; then
     error "package.json not found in $(pwd)."
-    error "Please clone the repository or place this script inside the Bot-Panel project directory."
+    error "Please run this script from inside the Bot-Panel project directory."
     exit 1
 fi
 
@@ -80,26 +80,6 @@ else
     fi
 fi
 
-# 4. Optional VPS Python environment setup
-if [ -f "bot.py" ] || [ -f "requirements.txt" ] || [ -d "vps-deploy" ]; then
-    info "Setting up VPS environment files..."
-    
-    if command -v apt &> /dev/null && command -v sudo &> /dev/null; then
-        info "Installing system Python packages via apt..."
-        sudo apt update -y && sudo apt install -y python3-pip python3-venv
-        
-        if [ -d "vps-deploy" ]; then
-            cd vps-deploy
-            if [ -f "requirements.txt" ]; then
-                python3 -m pip install -r requirements.txt --quiet
-            fi
-            cd "$PROJECT_ROOT"
-        fi
-        
-        python3 -m pip install --upgrade --quiet discord.py docker python-dotenv aiofiles PyNaCl psutil
-    fi
-fi
-
 echo
-info "Full installation complete!"
+info "Installation complete!"
 echo "To start your panel, run: npm start"
