@@ -31,9 +31,9 @@ RESTART_WINDOW=60   # seconds — restarts are counted within this rolling windo
 
 mkdir -p "$LOG_DIR"
 
-echo "=========================================="
+echo ───────────────────────────────────────────"
 echo "     Bot Panel — 24/7 Manager"
-echo "=========================================="
+echo ───────────────────────────────────────────"
 echo
 
 # ---- sanity checks ----
