@@ -1,5 +1,5 @@
 {
-  "name": "botpanel",
+  "name": "Bot Panel",
   "version": "1.0.0",
   "description": "Web control panel for managing a bot process (start/stop/status/logs/config)",
   "main": "server.js",
