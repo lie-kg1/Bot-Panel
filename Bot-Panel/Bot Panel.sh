@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 while true; do
     clear
     printf "${BLUE}──────────────────────────────────────${NC}\n"
-    printf "${CYAN}              BOTPANEL                ${NC}\n"
+    printf "${CYAN}              Bot Panel               ${NC}\n"
     printf "${BLUE}──────────────────────────────────────${NC}\n"
     printf "${YELLOW}1)${NC} 📦 Running install\n"
     printf "${YELLOW}2)${NC} ⚙️ Setup .env Configuration File\n"
