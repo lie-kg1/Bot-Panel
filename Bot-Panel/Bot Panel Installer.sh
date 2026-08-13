@@ -20,9 +20,9 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 PROJECT_ROOT="$SCRIPT_DIR"
 cd "$PROJECT_ROOT"
 
-echo "=========================================="
+echo "──────────────────────────────────────────"
 echo "         Bot Panel — Installer"
-echo "=========================================="
+echo "──────────────────────────────────────────"
 echo
 
 # ---- check for Node.js ----
