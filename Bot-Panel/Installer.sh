@@ -1,21 +1,19 @@
 #!/usr/bin/env bash
 #
-# Setup .env Configuration.sh — interactive .env editor for Bot Panel
+# install.sh — installer for Bot Panel
+# Installs dependencies, sets up .env, and prepares the panel to run.
 #
-# Lets you view and update PANEL_PASSWORD, SESSION_SECRET, PORT,
-# BOT_COMMAND, BOT_ARGS, and BOT_CWD without hand-editing the file.
-#
-# Works both as a local file and when run via
-# bash <(curl -sL .../Setup .env Configuration.sh) — in the latter
-# case there's no real script path, so we fall back to the current
-# working directory.
+# Works both as a local file (./install.sh) and when piped/run via
+# process substitution (bash <(curl -sL .../install.sh)) — in the
+# latter case there's no real script path on disk, so we fall back
+# to the current working directory instead of guessing one.
 #
 set -euo pipefail
 
+# ---- colors ----
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
-CYAN='\033[0;36m'
 NC='\033[0m'
 
 info()  { echo -e "${GREEN}[INFO]${NC} $1"; }
@@ -23,6 +21,9 @@ warn()  { echo -e "${YELLOW}[WARN]${NC} $1"; }
 error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
 # ---- resolve project root ----
+# When run via `bash <(curl ...)`, BASH_SOURCE[0] is a fake path like
+# /proc/12345/fd/63 or /dev/fd/63 — not a real script location. Detect
+# that and use the current directory instead of cd-ing into procfs.
 if [[ "${BASH_SOURCE[0]}" == /dev/fd/* || "${BASH_SOURCE[0]}" == /proc/*/fd/* ]]; then
     PROJECT_ROOT="$PWD"
 else
@@ -30,113 +31,95 @@ else
 fi
 cd "$PROJECT_ROOT"
 
-ENV_FILE=".env"
-ENV_EXAMPLE=".env.example"
-
-echo "──────────────────────────────────────────"
-echo "     Bot Panel — .env Configuration"
-echo "──────────────────────────────────────────"
+echo "=========================================="
+echo "         Bot Panel — Installer"
+echo "=========================================="
 echo
 
-# ---- confirm we're in the project directory ----
-if [ ! -f "$ENV_EXAMPLE" ] && [ ! -f "$ENV_FILE" ]; then
-    error "Neither .env nor .env.example found in $(pwd)."
-    error "Run this from inside the Bot-Panel project directory."
+# ---- confirm we're actually in the project directory ----
+if [ ! -f "package.json" ]; then
+    error "package.json not found in $(pwd)."
+    error "Run this from inside the Bot-Panel project directory (where package.json lives)."
+    error "If you haven't cloned the repo yet: git clone https://github.com/lie-kg1/Bot-Panel.git && cd Bot-Panel"
     exit 1
 fi
 
-# ---- ensure .env exists ----
-if [ ! -f "$ENV_FILE" ]; then
-    cp "$ENV_EXAMPLE" "$ENV_FILE"
-    info "No .env found — created one from $ENV_EXAMPLE."
+# ---- check for Node.js ----
+if ! command -v node &> /dev/null; then
+    error "Node.js is not installed. Install Node.js (v18+ recommended) and re-run this script."
+    exit 1
+fi
+NODE_VERSION="$(node -v)"
+info "Found Node.js $NODE_VERSION"
+
+NODE_MAJOR="$(node -v | sed -E 's/^v([0-9]+).*/\1/')"
+if [ "$NODE_MAJOR" -lt 18 ]; then
+    warn "Node.js $NODE_VERSION is older than the recommended v18+. The panel may still work, but consider upgrading if you hit issues."
 fi
 
-# ---- helper: get current value of a key ----
-get_val() {
-    local key="$1"
-    grep -E "^${key}=" "$ENV_FILE" 2>/dev/null | head -n1 | cut -d '=' -f2-
-}
+# ---- check for npm ----
+if ! command -v npm &> /dev/null; then
+    error "npm is not installed. It usually ships with Node.js — please install it and re-run this script."
+    exit 1
+fi
+info "Found npm $(npm -v)"
 
-# ---- helper: set/update a key, preserving the rest of the file ----
-set_val() {
-    local key="$1"
-    local val="$2"
-    if grep -q "^${key}=" "$ENV_FILE"; then
-        sed -i.bak "s|^${key}=.*|${key}=${val}|" "$ENV_FILE" && rm -f "${ENV_FILE}.bak"
-    else
-        echo "${key}=${val}" >> "$ENV_FILE"
-    fi
-}
+# ---- install dependencies ----
+info "Installing dependencies (npm install)..."
+npm install
 
-# ---- prompt helper: shows current value, keeps it on blank input ----
-prompt_val() {
-    local key="$1"
-    local label="$2"
-    local secret="${3:-false}"
-    local current
-    current="$(get_val "$key")"
-
-    if [ "$secret" = "true" ] && [ -n "$current" ]; then
-        echo -e "${CYAN}${label}${NC} (current: [hidden], press Enter to keep)"
-    else
-        echo -e "${CYAN}${label}${NC} (current: ${current:-not set}, press Enter to keep)"
-    fi
-    read -rp "> " new_val
-
-    if [ -n "$new_val" ]; then
-        set_val "$key" "$new_val"
-        info "${key} updated."
-    fi
-    echo
-}
-
-# ---- walk through each setting ----
-prompt_val "PANEL_PASSWORD" "Panel login password" true
-
-echo -e "${CYAN}Session secret${NC} (used to sign session cookies)"
-read -rp "Auto-generate a new random secret? [y/N]: " GEN_SECRET
-if [[ "$GEN_SECRET" =~ ^[Yy]$ ]]; then
-    if command -v openssl &> /dev/null; then
-        NEW_SECRET="$(openssl rand -hex 32)"
-        set_val "SESSION_SECRET" "$NEW_SECRET"
-        info "SESSION_SECRET regenerated."
-    else
-        warn "openssl not found — cannot auto-generate. Enter one manually below instead."
-        prompt_val "SESSION_SECRET" "Session secret" true
-    fi
+# ---- set up .env ----
+if [ -f ".env" ]; then
+    warn ".env already exists — leaving it untouched."
 else
-    prompt_val "SESSION_SECRET" "Session secret" true
+    if [ -f ".env.example" ]; then
+        cp .env.example .env
+        info "Created .env from .env.example."
+    else
+        error ".env.example not found — cannot create .env automatically."
+        exit 1
+    fi
+
+    # Generate a random session secret if possible
+    if command -v openssl &> /dev/null; then
+        SESSION_SECRET="$(openssl rand -hex 32)"
+        if grep -q '^SESSION_SECRET=' .env; then
+            sed -i.bak "s|^SESSION_SECRET=.*|SESSION_SECRET=${SESSION_SECRET}|" .env && rm -f .env.bak
+            info "Generated a random SESSION_SECRET."
+        fi
+    else
+        warn "openssl not found — please set SESSION_SECRET manually in .env."
+    fi
+
+    # Prompt for a panel password
+    echo
+    read -rp "Set a PANEL_PASSWORD now? (leave blank to edit .env manually later): " PANEL_PASSWORD
+    if [ -n "${PANEL_PASSWORD:-}" ] && grep -q '^PANEL_PASSWORD=' .env; then
+        sed -i.bak "s|^PANEL_PASSWORD=.*|PANEL_PASSWORD=${PANEL_PASSWORD}|" .env && rm -f .env.bak
+        info "PANEL_PASSWORD set."
+    else
+        warn "Remember to set PANEL_PASSWORD in .env before running the panel."
+    fi
 fi
-echo
 
-prompt_val "PORT" "Port for the panel to listen on"
-prompt_val "BOT_COMMAND" "Command used to launch the bot (e.g. python3)"
-prompt_val "BOT_ARGS" "Arguments passed to the bot command (e.g. bot.py)"
-prompt_val "BOT_CWD" "Working directory the bot runs from (e.g. ./bot)"
-
-# ---- create bot working directory if missing ----
-BOT_CWD_VAL="$(get_val "BOT_CWD")"
-BOT_CWD_VAL="${BOT_CWD_VAL:-./bot}"
-if [ ! -d "$BOT_CWD_VAL" ]; then
-    warn "Bot working directory '$BOT_CWD_VAL' does not exist."
+# ---- ensure bot working directory exists ----
+BOT_CWD="$(grep -E '^BOT_CWD=' .env 2>/dev/null | cut -d '=' -f2- || echo './bot')"
+BOT_CWD="${BOT_CWD:-./bot}"
+if [ ! -d "$BOT_CWD" ]; then
+    warn "Bot working directory '$BOT_CWD' does not exist yet."
     read -rp "Create it now? [y/N]: " CREATE_DIR
     if [[ "$CREATE_DIR" =~ ^[Yy]$ ]]; then
-        mkdir -p "$BOT_CWD_VAL"
-        info "Created $BOT_CWD_VAL"
+        mkdir -p "$BOT_CWD"
+        info "Created $BOT_CWD"
     fi
 fi
 
 echo
-info "Configuration saved to $ENV_FILE."
+info "Installation complete."
 echo
-echo "Current settings:"
-echo "-----------------"
-grep -v '^\s*#' "$ENV_FILE" | grep -v '^\s*$' | while IFS='=' read -r key value; do
-    if [ "$key" = "PANEL_PASSWORD" ] || [ "$key" = "SESSION_SECRET" ]; then
-        echo "  ${key}=********"
-    else
-        echo "  ${key}=${value}"
-    fi
-done
+echo "Next steps:"
+echo "  1. Review/edit .env (PANEL_PASSWORD, BOT_COMMAND, BOT_ARGS, BOT_CWD, PORT)"
+echo "  2. Start the panel with: npm start   (or ./botpanel.sh if provided)"
+echo "  3. Open http://localhost:<PORT> and sign in with your PANEL_PASSWORD"
 echo
-warn "Restart the panel (npm start) for changes to take effect."
+warn "Security reminder: don't expose this panel to the internet without a reverse proxy + HTTPS."
