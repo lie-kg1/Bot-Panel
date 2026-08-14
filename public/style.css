@@ -119,10 +119,6 @@ button { font-family: inherit; }
   color: var(--accent-hover);
 }
 
-.nav-item-muted {
-  color: var(--text-faint);
-}
-
 .sidebar-signout {
   display: flex;
   align-items: center;
@@ -232,9 +228,7 @@ button { font-family: inherit; }
 .power-restart:hover:not(:disabled) { border-color: var(--amber); color: var(--amber); }
 .power-stop:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
 
-/* ---- Views ---- */
-.view { display: block; }
-
+/* ---- Stats ---- */
 .stat-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -266,6 +260,7 @@ button { font-family: inherit; }
   font-weight: 500;
 }
 
+/* ---- Console & Config ---- */
 .console-card {
   background: var(--bg-card);
   border: 1px solid var(--line);
@@ -378,6 +373,68 @@ button { font-family: inherit; }
 .toast.show.success { border-color: var(--green); }
 .toast.show.error { border-color: var(--red); }
 
+/* ---- Login Page Specific Styling ---- */
+.login-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  background: var(--bg-main);
+}
+
+.login-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 32px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.login-card h1 {
+  margin: 0 0 6px 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.login-card p {
+  color: var(--text-dim);
+  font-size: 14px;
+  margin: 0 0 22px 0;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  margin-bottom: 6px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px 12px;
+  background: #0e1019;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  outline: none;
+  transition: border-color 0.12s ease;
+}
+
+.input-field:focus {
+  border-color: var(--accent);
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 760px) {
   .shell { flex-direction: column; }
@@ -388,10 +445,4 @@ button { font-family: inherit; }
   .sidebar-signout { display: none; }
   .main { padding: 18px; }
   .stat-row { grid-template-columns: repeat(2, 1fr); }
-}
-
-/* ---- Reduced motion ---- */
-@media (prefers-reduced-motion: reduce) {
-  .status-dot[data-state="running"] { animation: none; }
-  .power-btn:hover:not(:disabled) { transform: none; }
 }
