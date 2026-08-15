@@ -1,0 +1,15 @@
+[
+  {
+    "id": "6299e615-ef8e-4b67-a607-bb48283b2f31",
+    "username": "owner",
+    "passwordHash": "$2a$10$rCBesi4d2f.k7KPXbJCVgegqmVxwkjDLPCknMiCFfNaowT18nUA8u",
+    "email": "",
+    "role": "owner",
+    "createdAt": 1786687367911,
+    "lastLogin": {
+      "ip": "::ffff:10.0.0.3",
+      "device": "Desktop",
+      "ts": 1786702744543
+    }
+  }
+]

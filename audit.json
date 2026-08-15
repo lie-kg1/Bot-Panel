@@ -1,0 +1,20 @@
+[
+  {
+    "actor": "owner",
+    "action": "auth.login",
+    "detail": "Signed in from ::ffff:10.0.0.3",
+    "ts": 1786702264052
+  },
+  {
+    "actor": "owner",
+    "action": "auth.logout",
+    "detail": "Signed out",
+    "ts": 1786702425320
+  },
+  {
+    "actor": "owner",
+    "action": "auth.login",
+    "detail": "Signed in from ::ffff:10.0.0.3",
+    "ts": 1786702744544
+  }
+]
