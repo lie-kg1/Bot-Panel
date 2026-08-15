@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Login · Nobita Host</title>
+<title>Forgot Password · Bot Panel</title>
 <style>
   * { box-sizing: border-box; }
   html, body {
@@ -16,6 +16,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 40px 16px;
     background:
       radial-gradient(ellipse at 20% 100%, rgba(120, 80, 60, 0.35), transparent 55%),
       radial-gradient(ellipse at 80% 100%, rgba(60, 50, 90, 0.35), transparent 55%),
@@ -25,7 +26,6 @@
     overflow: hidden;
   }
 
-  /* stars */
   .stars {
     position: absolute;
     inset: 0;
@@ -49,7 +49,6 @@
     opacity: 0.8;
   }
 
-  /* mountains silhouette */
   .mountains {
     position: absolute;
     bottom: 0;
@@ -99,21 +98,16 @@
     font-size: 13px;
     color: #cfcfd6;
     margin-bottom: 6px;
-    margin-top: 16px;
   }
 
-  .field-wrap {
-    position: relative;
-  }
+  .field-wrap { position: relative; }
 
-  input[type="text"],
-  input[type="password"],
   input[type="email"] {
     width: 100%;
     background: rgba(10, 10, 20, 0.6);
     border: 1px solid rgba(120, 130, 200, 0.35);
     border-radius: 8px;
-    padding: 11px 40px 11px 12px;
+    padding: 11px 12px;
     font-size: 14px;
     color: #f0f0f5;
     outline: none;
@@ -125,34 +119,7 @@
     box-shadow: 0 0 0 3px rgba(91, 141, 239, 0.2);
   }
 
-  input::placeholder {
-    color: #6f6f80;
-  }
-
-  .field-icon {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 14px;
-    color: #7a7a8c;
-    pointer-events: none;
-  }
-
-  .show-toggle {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 12px;
-    color: #9a9aac;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-  }
-
-  .show-toggle:hover { color: #cfcfe0; }
+  input::placeholder { color: #6f6f80; }
 
   .btn {
     width: 100%;
@@ -166,56 +133,22 @@
     color: #fff;
     transition: filter 0.15s ease, transform 0.1s ease;
   }
-
   .btn:hover { filter: brightness(1.08); }
   .btn:active { transform: translateY(1px); }
 
-  .btn-login {
+  .btn-reset {
     background: linear-gradient(90deg, #3f6fd6, #5f8de8);
   }
 
-  .btn-github {
-    background: linear-gradient(90deg, #1fae8e, #2fa8d8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .divider {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 20px 0;
-    color: #6f6f80;
-    font-size: 11px;
-    letter-spacing: 1px;
-  }
-  .divider::before, .divider::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: rgba(255,255,255,0.12);
-  }
-
-  .links-row {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 18px;
+  .footer-row {
+    margin-top: 16px;
     font-size: 12.5px;
   }
-
-  .links-row a {
+  .footer-row a {
     color: #7fa5f0;
     text-decoration: none;
   }
-  .links-row a:hover { text-decoration: underline; }
-
-  .gh-icon {
-    width: 15px;
-    height: 15px;
-    fill: #fff;
-  }
+  .footer-row a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -241,75 +174,30 @@
         fill="url(#nGrad)"/>
     </svg>
 
-    <div class="brand">Nobita Host</div>
-    <div class="tagline">Built for Developers &amp; Teams</div>
+    <div class="brand">Forgot Password</div>
+    <div class="tagline">We'll email you a reset link</div>
 
-    <form id="login-form">
-      <label for="user">Username or Email</label>
+    <form id="forgot-form">
+      <label for="email">Email</label>
       <div class="field-wrap">
-        <input type="text" id="user" placeholder="Enter username or email" autocomplete="username" required autofocus>
-        <span class="field-icon">👤</span>
+        <input type="email" id="email" placeholder="you@example.com">
       </div>
 
-      <label for="pass">Password</label>
-      <div class="field-wrap">
-        <input type="password" id="pass" placeholder="Enter password" autocomplete="current-password" required>
-        <button type="button" class="show-toggle" onclick="const p=document.getElementById('pass'); p.type = p.type==='password' ? 'text' : 'password'; this.textContent = p.type==='password' ? 'Show' : 'Hide';">Show</button>
-      </div>
-
-      <button type="submit" class="btn btn-login">Login</button>
-      <p id="login-error" style="color:#f0505a; font-size:13px; margin:12px 0 0; display:none;"></p>
-
-      <div class="divider">OR</div>
-
-      <button type="button" class="btn btn-github" disabled title="GitHub sign-in isn't configured on this server">
-        <svg class="gh-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
-            0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
-            -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66
-            .07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15
-            -.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0
-            1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82
-            1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01
-            1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/>
-        </svg>
-        Continue with GitHub
-      </button>
+      <button type="submit" class="btn btn-reset">Send Reset Link</button>
+      <p id="forgot-note" style="color:#cfcfd6; font-size:12.5px; margin:12px 0 0; display:none;">
+        Password resets aren't wired up on this server yet — ask your panel admin to reset it for you.
+      </p>
     </form>
 
-    <div class="links-row">
-      <a href="/forgot.html">Forgot password?</a>
-      <a href="/register.html">Create account</a>
+    <div class="footer-row">
+      <a href="/login.html">Back to login</a>
     </div>
   </div>
 
   <script>
-    const form = document.getElementById('login-form');
-    const errorEl = document.getElementById('login-error');
-
-    form.addEventListener('submit', async (e) => {
+    document.getElementById('forgot-form').addEventListener('submit', (e) => {
       e.preventDefault();
-      errorEl.style.display = 'none';
-      const username = document.getElementById('user').value;
-      const password = document.getElementById('pass').value;
-
-      try {
-        const res = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }),
-        });
-        const data = await res.json();
-        if (data.success) {
-          window.location.href = '/';
-        } else {
-          errorEl.textContent = data.message || 'Sign in failed.';
-          errorEl.style.display = 'block';
-        }
-      } catch (err) {
-        errorEl.textContent = 'Could not reach the panel server.';
-        errorEl.style.display = 'block';
-      }
+      document.getElementById('forgot-note').style.display = 'block';
     });
   </script>
 
